@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}
+Chi tiết thành viên
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ request.url_for('static', path='css/entity_detail.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="detail-wrapper">
+
+    <!-- BACK BUTTON -->
+    <a href="/entities/" class="back-btn">
+        ❮❮ Quay lại / ✧Hoa sở hữu✧
+    </a>
+
+    <!-- ENTITY INFO -->
+    <div class="entity-header mt-4">
+
+        <div class="avatar">
+            {{ entity.name[0]|upper }}
+        </div>
+
+        <div class="info">
+            <h2>{{ entity.name }} (˶ᵔ ᵕ ᵔ˶) - ‹𝟹</h2>
+        </div>
+
+    </div>
+
+    <!-- FLOWERS -->
+    <div id="flowerList" class="flower-grid">
+        <!-- JS render -->
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block js %}
+<script>
+
+    const entityId = "{{ entity.id }}";
+
+async function loadInventory() {
+
+    const res = await fetch(`/inventory/${entityId}`);
+    const data = await res.json();
+
+    const container = document.getElementById("flowerList");
+
+    container.innerHTML = "";
+
+    // =========================
+    // EMPTY STATE CHECK
+    // =========================
+    if (!data.owned || data.owned.length === 0) {
+
+        const empty = document.createElement("div");
+
+        empty.className = "empty-state full-span";
+
+        empty.innerHTML = `
+            <div class="empty-icon">🌱</div>
+            <div class="empty-text">Người này chưa sở hữu bông hoa nào</div>
+            <div class="empty-sub">Hãy quay lại và thêm hoa cho họ ✨</div>
+        `;
+
+        container.appendChild(empty);
+        return;
+    }
+
+    // =========================
+    // NORMAL FLOW
+    // =========================
+    for (const item of data.owned) {
+
+        const flowerRes = await fetch(`/flowers/${item.flower_id}`);
+        const flower = await flowerRes.json();
+
+        const card = document.createElement("div");
+
+        const rankClass = "r" + flower.rank;
+
+        card.className = `flower-card ${rankClass}`;
+
+        card.innerHTML = `
+            <img src="${flower.img}" />
+            <div class="name">${flower.name}</div>
+        `;
+
+        container.appendChild(card);
+    }
+}
+
+    loadInventory();
+
+</script>
+{% endblock %}

@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Backup Database - Lạc Hà
+{% endblock %}
+
+
+
+{% block css %}
+
+<link rel="stylesheet" href="{{ request.url_for('static',
+path='css/backup.css') }}">
+
+{% endblock %}
+
+
+
+
+
+{% block content %}
+
+
+<div class="backup-card">
+
+
+      <h2>
+            🌸 Database Backup
+      </h2>
+
+
+
+      <div class="backup-section">
+
+
+            <h4>
+                  📦 Export dữ liệu
+            </h4>
+
+
+            <p>
+                  Tải xuống database + toàn bộ ảnh hoa
+            </p>
+
+
+            <a class="export-btn" href="/backup/export">
+
+                  ⬇ Export Backup
+
+            </a>
+
+
+      </div>
+
+
+
+
+
+      <div class="divider"></div>
+
+
+
+
+      <div class="backup-section">
+
+
+            <h4>
+                  📥 Import dữ liệu
+            </h4>
+
+
+            <p>
+                  Khôi phục database và ảnh từ file backup
+            </p>
+
+
+
+            <!-- <form method="POST" action="/backup/import" enctype="multipart/form-data" id="importForm">
+
+
+                  <input type="file" name="file" accept=".zip" required>
+
+
+                  <button type="submit" id="importBtn">
+
+                        ♻ Import Backup
+
+                  </button>
+
+
+
+            </form> -->
+
+
+            <div id="loading">
+                  ⏳ Đang khôi phục...
+            </div>
+
+
+
+      </div>
+
+
+
+</div>
+
+
+
+{% endblock %}
+
+
+
+
+{% block js %}
+
+
+<script>
+
+      document
+            .getElementById("importForm")
+            .addEventListener(
+                  "submit",
+                  () => {
+
+
+                        document
+                              .getElementById("importBtn")
+                              .disabled = true;
+
+
+                        document
+                              .getElementById("loading")
+                              .style.display = "block";
+
+
+                  });
+
+
+</script>
+
+
+{% endblock %}

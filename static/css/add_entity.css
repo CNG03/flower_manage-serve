@@ -1,0 +1,237 @@
+body {
+    background: #fde2ec;
+    padding-top:80px;
+
+}
+
+
+/* CARD */
+
+.entity-card {
+
+    max-width:500px;
+
+    margin:auto;
+
+    background:
+    rgba(255,255,255,0.75);
+
+    backdrop-filter:blur(12px);
+
+    padding:35px;
+
+    border-radius:20px;
+
+    box-shadow:
+    0 15px 40px rgba(0,0,0,.08);
+
+    animation:
+    show .35s ease;
+
+}
+
+
+
+@keyframes show {
+
+    from {
+
+        opacity:0;
+        transform:translateY(15px);
+
+    }
+
+    to {
+
+        opacity:1;
+        transform:translateY(0);
+
+    }
+
+}
+
+
+
+.entity-card h2 {
+
+    text-align:center;
+
+    color:#ff4d6d;
+
+    margin-bottom:30px;
+
+}
+
+
+
+/* INPUT */
+
+
+.input-group {
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+
+}
+
+
+
+.input-group label {
+
+    font-weight:600;
+
+}
+
+
+
+.input-group input {
+
+
+    padding:12px 15px;
+
+    border-radius:14px;
+
+    border:
+
+    1px solid rgba(0,0,0,.1);
+
+    outline:none;
+
+    transition:.25s;
+
+}
+
+
+
+.input-group input:focus {
+
+
+    border-color:#ff4d6d;
+
+
+    box-shadow:
+
+    0 0 0 4px
+
+    rgba(255,77,109,.15);
+
+}
+
+
+
+/* BUTTON */
+
+
+.btn-create {
+
+
+    width:100%;
+
+    margin-top:25px;
+
+    padding:13px;
+
+
+    border:none;
+
+    border-radius:14px;
+
+
+    background:
+
+    linear-gradient(
+        135deg,
+        #ff4d6d,
+        #ff8a5b
+    );
+
+
+    color:white;
+
+    font-weight:600;
+
+
+    transition:.25s;
+
+}
+
+
+
+.btn-create:hover {
+
+
+    transform:translateY(-3px);
+
+
+    box-shadow:
+
+    0 10px 25px
+
+    rgba(255,77,109,.3);
+
+}
+
+
+// ===== ALERT =====
+.alert {
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    font-weight: 500;
+    animation: fadeIn .3s ease;
+}
+
+.alert.success {
+    background: #e8fff1;
+    color: #1b8a4a;
+    border: 1px solid #b7f0cd;
+}
+
+.alert.error {
+    background: #ffe8ea;
+    color: #c62828;
+    border: 1px solid #ffb3b8;
+}
+
+// ===== BUTTON LOADING =====
+button {
+    position: relative;
+}
+
+button .spinner {
+    display: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid white;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    margin-left: 8px;
+    animation: spin 0.8s linear infinite;
+}
+
+button.loading .spinner {
+    display: inline-block;
+}
+
+button.loading .btn-text {
+    opacity: 0.8;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

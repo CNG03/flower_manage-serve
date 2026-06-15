@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>{% block title %} Lạc Hà {% endblock %}</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ request.url_for('static', path='tulips.png') }}" />
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="{{ request.url_for('static',
+          path='bootstrap/bootstrap.min.css') }}" />
+
+    <!-- CSS chung -->
+    <link rel="stylesheet" href="{{ request.url_for('static',
+          path='css/index.css') }}" />
+
+    <!-- CSS riêng từng trang -->
+    {% block css %} {% endblock %}
+</head>
+
+<body>
+    <!-- ================= NAVBAR ================= -->
+
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top px-3">
+        <div class="container-fluid">
+            <!-- Logo -->
+            <a class="navbar-brand" href="/">
+                <img src="{{ request.url_for('static',
+            path='tulips.png') }}" width="28" height="28" />
+
+                Lạc Hà
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- MENU -->
+
+            <div class="collapse navbar-collapse" id="nav">
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <img class="nav-icon" src="{{ request.url_for('static',
+                        path='icons/house.svg') }}" />
+
+                            Home
+                        </a>
+                    </li>
+
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/inventory/">
+                            <img class="nav-icon" src="{{ request.url_for('static',
+                        path='icons/check-square.svg') }}" />
+
+                            Tick hoa của tôi
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/entities">
+                            <img class="nav-icon" src="{{ request.url_for('static',
+                        path='icons/people.svg') }}" />
+
+                            Thành viên
+                        </a>
+                    </li>
+
+
+
+                    {% if user and user.role == "root" %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/flowers">
+                            <img class="nav-icon" src="{{ request.url_for('static',
+                        path='icons/flower3.svg') }}" />
+
+                            Danh sách hoa
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/flowers/add">
+                            <img class="nav-icon" src="{{ request.url_for('static',
+                        path='icons/patch-plus.svg') }}" />
+
+                            Thêm hoa
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/entities/add">
+                            <img class="nav-icon" src="{{ request.url_for('static',
+                        path='icons/plus-circle.svg') }}" />
+
+                            Thêm thành viên
+                        </a>
+                    </li>
+                    <!-- menu root -->
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/account">
+                            <img class="nav-icon" src="{{ request.url_for('static',
+                        path='icons/people.svg') }}" />
+
+                            Account
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/backup">
+                            <img class="nav-icon" src="{{ request.url_for('static',
+                        path='icons/database.svg') }}" />
+
+                            DB
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ================= MAIN ================= -->
+
+    <div class="container">{% block content %} {% endblock %}</div>
+
+    <!-- Bootstrap -->
+
+    <script src="{{ request.url_for('static',
+path='bootstrap/bootstrap.min.js') }}"></script>
+
+    <!-- JS riêng -->
+
+    {% block js %} {% endblock %}
+    <!-- ================= FOOTER ================= -->
+    <footer class="site-footer">
+
+        <div class="footer-container">
+
+            <!-- BRAND -->
+            <div class="footer-col">
+                <div class="footer-title">
+                    🌸 Lạc Hà 🌸
+                </div>
+
+                <p>
+                    Hội cày chay, toàn clone, buff bẩn các thứ đồ...
+                </p>
+            </div>
+
+            <!-- NAV -->
+            <div class="footer-col">
+                <div class="footer-title">Navigation</div>
+
+                <a href="/">Home</a>
+                <a href="/flowers">Danh sách hoa</a>
+                <a href="/inventory">Tich hoa của tôi </a>
+                <a href="/entities">Thành viên</a>
+            </div>
+
+            <!-- ACTION -->
+            <div class="footer-col">
+                <div class="footer-title">Actions</div>
+
+                <a href="/flowers/add">Thêm hoa</a>
+                <a href="/entities/add">Thêm thành viên</a>
+            </div>
+
+            <!-- INFO -->
+            <div class="footer-col">
+                <div class="footer-title">Info</div>
+
+                <p>Made with 💖 by Lạc Hà</p>
+                <p>© 2026 All rights reserved</p>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            <span>🌷 You make my heart bloom.</span>
+        </div>
+
+    </footer>
+</body>
+
+</html>

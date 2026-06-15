@@ -1,0 +1,59 @@
+version: "3.9"
+
+services:
+
+  app:
+    build: .
+    container_name: flower_app
+    restart: always
+
+    working_dir: /app
+
+    volumes:
+      - ./static:/app/static
+
+    expose:
+      - "8000"
+
+    command: gunicorn main:app -c gunicorn.conf.py
+
+    depends_on:
+      - cron
+
+
+  nginx:
+    image: nginx:latest
+    container_name: flower_nginx
+    restart: always
+
+    ports:
+      - "80:80"
+      - "443:443"
+
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./static:/app/static:ro
+      - ./ssl:/etc/letsencrypt:ro
+
+    depends_on:
+      - app
+
+
+  cron:
+    build: .
+    container_name: flower_cron
+    restart: always
+
+    working_dir: /app
+
+    volumes:
+      - ./database:/app/database
+
+    command: >
+      sh -c "
+      echo '0 2 * * * python /app/database/backup_db.py >> /var/log/cron.log 2>&1' > /etc/cron.d/backup &&
+      chmod 0644 /etc/cron.d/backup &&
+      crontab /etc/cron.d/backup &&
+      touch /var/log/cron.log &&
+      cron -f
+      "

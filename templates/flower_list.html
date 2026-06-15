@@ -1,0 +1,173 @@
+{% extends "base.html" %} {% block title %}Danh sách hoa - Lạc Hà{% endblock %}
+{% block css %}
+<link
+    rel="stylesheet"
+    href="{{ request.url_for('static', path='css/flowers.css') }}"
+/>
+{% endblock %} {% block content %}
+
+<h2 class="page-title">🌸 Danh sách hoa</h2>
+
+<div class="search-bar">
+
+    <input type="text"
+           id="searchInput"
+           placeholder="🔎 Tìm kiếm hoa..."
+           class="search-input">
+
+    <button class="btn-reset" onclick="resetSearch()">
+         Làm mới
+    </button>
+
+</div>
+<div class="total-flower">
+    🌸 Tổng số hoa: {{ flowers | length }}
+</div>
+<div class="flower-grid">
+    {% for f in flowers %}
+    <div class="flower-card" data-name="{{ f.name | lower }}">
+        <img class="flower-img" src="{{ f.img }}" alt="{{ f.name }}" />
+
+        <div class="flower-info">
+            <h3 class="flower-name">{{ f.name }}</h3>
+
+            <div class="flower-rank">
+                Phẩm:
+                <span class="rank-{{ f.rank }}">
+                    {% if f.rank == 1 %} Lục {% elif f.rank == 2 %} Lam {% elif
+                    f.rank == 3 %} Tím {% elif f.rank == 4 %} Cam {% elif f.rank
+                    == 5 %} Đỏ {% else %} Không xác định {% endif %}
+                </span>
+            </div>
+
+            <div class="flower-owner">
+                Sở thành viên sở hữu:
+                <span> {{ count_map.get(f.id, 0) }}</span>
+            </div>
+
+            <div class="flower-actions">
+                <!-- EDIT -->
+                <a class="btn-edit" href="/flowers/edit/{{ f.id }}">✍️ Sửa </a>
+
+                <!-- DELETE -->
+                <button
+                    class="btn-delete"
+                    onclick="confirmDelete(this, '{{ f.id }}')"
+                >
+                    ✖️ Xóa
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div id="emptyState" class="empty-state d-none">
+    🌱 Không tìm thấy bông hoa nào
+</div>
+
+<!-- JS confirm delete -->
+<script>
+async function confirmDelete(btn, id) {
+
+    const ok = confirm("Bạn có chắc muốn xóa bông hoa này không?");
+    if (!ok) return;
+
+    // UI loading state
+    btn.disabled = true;
+    btn.innerText = "Deleting...";
+
+    try {
+        const res = await fetch(`/flowers/${id}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw new Error(data.detail || "Delete failed");
+        }
+
+        // success UI
+        showToast("Xóa thành công 🌸", "success");
+
+        // remove card khỏi UI
+        btn.closest(".flower-card").remove();
+
+    } catch (err) {
+
+        showToast(err.message, "error");
+
+        btn.disabled = false;
+        btn.innerText = "Delete";
+    }
+}
+
+/* Toast system */
+function showToast(message, type) {
+
+    let toast = document.createElement("div");
+
+    toast.className = `toast-msg ${type}`;
+    toast.innerText = message;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.add("show");
+    }, 100);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 2500);
+}
+const searchInput = document.getElementById("searchInput");
+const cards = document.querySelectorAll(".flower-card");
+const emptyState = document.getElementById("emptyState");
+
+searchInput.addEventListener("input", function () {
+
+    const keyword = this.value.toLowerCase().trim();
+
+    let hasResult = false;
+
+    cards.forEach(card => {
+
+        const name = card.dataset.name;
+
+        if (name.includes(keyword)) {
+            card.style.display = "block";
+            hasResult = true;
+        } else {
+            card.style.display = "none";
+        }
+
+    });
+
+    // HIỂN THỊ / ẨN EMPTY STATE
+    if (hasResult) {
+        emptyState.classList.add("d-none");
+    } else {
+        emptyState.classList.remove("d-none");
+    }
+});
+
+function resetSearch() {
+
+    searchInput.value = "";
+
+    let hasAny = false;
+
+    cards.forEach(card => {
+        card.style.display = "block";
+        hasAny = true;
+    });
+
+    emptyState.classList.add("d-none");
+}
+</script>
+
+{% endblock %}

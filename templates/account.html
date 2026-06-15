@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Account Admin{% endblock %}
+
+{% block content %}
+
+<h2>👑 Quản lý tài khoản (Root)</h2>
+
+<hr>
+
+<!-- =====================
+    FLASH MESSAGE
+===================== -->
+{% if msg %}
+
+<div class="alert 
+    {% if msg_type == 'success' %}
+        alert-success
+    {% else %}
+        alert-danger
+    {% endif %}
+">
+
+    {{ msg }}
+
+</div>
+
+{% endif %}
+
+
+
+<!-- =====================
+    ROOT CHANGE PASSWORD
+===================== -->
+<div class="card p-3 mb-4">
+
+    <h4>🔐 Đổi mật khẩu ROOT</h4>
+
+    <form method="post" action="/account/change-root-password">
+
+        <input class="form-control mb-2"
+               name="old_password"
+               type="password"
+               placeholder="Mật khẩu cũ">
+
+        <input class="form-control mb-2"
+               name="new_password"
+               type="password"
+               placeholder="Mật khẩu mới">
+
+        <button class="btn btn-primary">
+            Đổi mật khẩu ROOT
+        </button>
+
+    </form>
+
+</div>
+
+
+
+<!-- =====================
+    RESET USER PASSWORD
+===================== -->
+<div class="card p-3 border-danger">
+
+    <h4>👤 Reset mật khẩu USER</h4>
+
+    <form method="post" action="/account/reset-user-password">
+
+        <select name="user_id" class="form-control mb-2">
+
+            {% for u in users %}
+                {% if u.role != "root" %}
+                <option value="{{ u.id }}">
+                    {{ u.username }}
+                </option>
+                {% endif %}
+            {% endfor %}
+
+        </select>
+
+        <input class="form-control mb-2"
+               name="new_password"
+               type="password"
+               placeholder="Mật khẩu mới">
+
+        <button class="btn btn-danger">
+            Reset password
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

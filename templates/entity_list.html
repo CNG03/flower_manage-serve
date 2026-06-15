@@ -1,0 +1,208 @@
+{% extends "base.html" %} {% block title %} Danh sách thành viên - Lạc Hà {%
+endblock %} {% block css %}
+<link
+    rel="stylesheet"
+    href="{{ request.url_for('static', path='css/entity_list.css') }}"
+/>
+{% endblock %} {% block content %}
+<h2 class="page-title">🌸 Danh sách thành viên hội</h2>
+
+<div class="entity-wrapper">
+    <!-- SEARCH -->
+    <div class="search-box">
+        <form method="GET" action="/entities">
+            <input
+                type="text"
+                name="q"
+                value="{{ q }}"
+                placeholder="🔍 Tìm kiếm thành viên..."
+            />
+
+            <button type="submit">Tìm</button>
+
+            <button type="button" onclick="window.location.href = '/entities'">
+                Refresh
+            </button>
+        </form>
+    </div>
+
+    <!-- TABLE LIST -->
+    <div class="entity-table">
+        <!-- HEADER -->
+
+        <div class="table-header">
+            <div>Thành viên</div>
+
+            <div>Thao tác</div>
+        </div>
+
+        {% for e in entities %}
+
+        <div class="entity-row">
+            <!-- USER -->
+
+            <a href="/entities/{{ e.id }}" class="entity-user">
+                <div class="avatar">{{ e.name[0]|upper }}</div>
+
+                <div>
+                    <div class="entity-name">{{ e.name }}</div>
+
+                    <div class="flower-count">
+                        Sở hữu {{ e.total_flowers or 0 }} bông hoa
+                    </div>
+                </div>
+            </a>
+
+            <!-- ACTION -->
+
+            <div class="actions">
+                <button
+                    class="btn edit"
+                    onclick="openEditModal('{{ e.id }}', '{{ e.name }}')"
+                >
+                    ✍️ Sửa
+                </button>
+
+                <button onclick="deleteEntity('{{ e.id }}')" class="btn delete">
+                    ✖️ Xóa
+                </button>
+            </div>
+        </div>
+
+        {% endfor %}
+    </div>
+
+    {% if entities|length == 0 %}
+
+    <div class="empty">Không tìm thấy thành viên <span style="font-style: normal;">😢</span></div>
+
+    {% endif %}
+</div>
+
+<!-- ================= EDIT MODAL ================= -->
+<div id="editModal" class="modal-overlay">
+    <div class="modal-box">
+        <h3>✍️ Sửa thành viên</h3>
+
+        <input type="hidden" id="editEntityId" />
+
+        <input type="text" id="editEntityName" placeholder="Nhập tên mới..." />
+
+        <div class="modal-actions">
+            <button onclick="closeModal()" class="btn cancel">Huỷ</button>
+
+            <button onclick="submitEdit()" class="btn save">Lưu</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %} {% block js %}
+
+<script>
+    async function deleteEntity(id) {
+        if (!confirm("Bạn có chắc muốn xóa thành viên này?")) return;
+
+        const btn = document.querySelector(
+            `button[onclick="deleteEntity('${id}')"]`,
+        );
+
+        try {
+            // disable button nếu có
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = "Đang xóa...";
+            }
+
+            const res = await fetch(`/entities/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.detail || "Không thể xóa");
+            }
+
+            // UX tốt hơn: xóa trực tiếp row khỏi DOM
+            const row = btn?.closest(".entity-row");
+            if (row) {
+                row.style.transition = "0.3s";
+                row.style.opacity = "0";
+                row.style.transform = "translateX(20px)";
+
+                setTimeout(() => {
+                    row.remove();
+                }, 300);
+            }
+        } catch (err) {
+            alert(err.message || "Có lỗi xảy ra");
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = "🗑 Xóa";
+            }
+        }
+    }
+</script>
+<script>
+    // ================= OPEN MODAL =================
+    function openEditModal(id, name) {
+        document.getElementById("editEntityId").value = id;
+        document.getElementById("editEntityName").value = name;
+
+        document.getElementById("editModal").style.display = "flex";
+    }
+
+    // ================= CLOSE MODAL =================
+    function closeModal() {
+        document.getElementById("editModal").style.display = "none";
+    }
+
+    // ================= SUBMIT EDIT =================
+    async function submitEdit() {
+        const id = document.getElementById("editEntityId").value;
+        const name = document.getElementById("editEntityName").value.trim();
+
+        if (!name) {
+            alert("Tên không được để trống");
+            return;
+        }
+
+        try {
+            const res = await fetch(`/entities/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ name }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.detail || "Update failed");
+            }
+
+            // update UI realtime
+            const row = document
+                .querySelector(
+                    `.entity-row button[onclick*="deleteEntity('${id}')"]`,
+                )
+                ?.closest(".entity-row");
+
+            if (row) {
+                const nameEl = row.querySelector(".entity-name");
+                if (nameEl) nameEl.innerText = name;
+            }
+
+            closeModal();
+        } catch (err) {
+            alert(err.message || "Có lỗi xảy ra");
+        }
+    }
+</script>
+
+{% endblock %}

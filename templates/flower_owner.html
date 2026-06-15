@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}
+Người sở hữu - {{ flower.name }}
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ request.url_for('static', path='css/owner.css') }}">
+{% endblock %}
+
+{% block content %}
+<nav class="breadcrumb-nav">
+
+    <a href="/" class="nav-link">
+        Trang chủ
+    </a>
+
+    <span class="sep">/</span>
+
+    <span class="current">
+        {{ flower.name }}
+    </span>
+
+</nav>
+<div class="header">
+    <img src="{{ flower.img }}" class="flower-img">
+
+    <div class="info">
+        <h2>{{ flower.name }}</h2>
+
+        <div class="rank-{{ flower.rank }}">
+            Phẩm:
+            {% if flower.rank == 1 %} Lục
+            {% elif flower.rank == 2 %} Lam
+            {% elif flower.rank == 3 %} Tím
+            {% elif flower.rank == 4 %} Cam
+            {% elif flower.rank == 5 %} Đỏ
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h3> Danh sách người sở hữu</h3>
+
+<div class="search-bar">
+
+    <input type="text" id="searchInput" placeholder="🔎 Tìm kiếm thành viên..." class="search-input">
+
+    <button class="btn-reset" onclick="resetSearch()">
+         Làm mới
+    </button>
+
+</div>
+
+{% if owners|length == 0 %}
+<div class="empty">
+    🌱 Chưa có ai sở hữu hoa này
+</div>
+{% endif %}
+
+<div class="owner-grid">
+
+    {% for o in owners %}
+    <div class="owner-card" data-name="{{ o.name | lower }}">
+
+        <div class="avatar">
+            {% if o.avatar %}
+            <img src="{{ o.avatar }}">
+            {% else %}
+            {{ o.name[0]|upper }}
+            {% endif %}
+        </div>
+
+        <div class="owner-info">
+            <div class="name">{{ o.name }}</div>
+        </div>
+
+    </div>
+    {% endfor %}
+    <div id="emptyState" class="empty d-none">
+        🌱 Không tìm thấy thành viên nào
+    </div>
+
+</div>
+<script>
+
+const searchInput = document.getElementById("searchInput");
+const cards = document.querySelectorAll(".owner-card");
+const emptyState = document.getElementById("emptyState");
+
+searchInput.addEventListener("input", function () {
+
+    const keyword = this.value.toLowerCase().trim();
+
+    let hasResult = false;
+
+    cards.forEach(card => {
+
+        const name = card.dataset.name;
+
+        if (name.includes(keyword)) {
+            card.style.display = "flex";
+            hasResult = true;
+        } else {
+            card.style.display = "none";
+        }
+
+    });
+
+    emptyState.classList.toggle("d-none", hasResult);
+});
+
+function resetSearch() {
+
+    searchInput.value = "";
+
+    cards.forEach(card => {
+        card.style.display = "flex";
+    });
+
+    emptyState.classList.add("d-none");
+}
+
+</script>
+
+{% endblock %}

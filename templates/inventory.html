@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %} Tick Hoa - Lạc Hà {% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ request.url_for('static', path='/css/inventory.css') }}">
+{% endblock %}
+
+{% block content %}
+<h2 class="page-title">🌸 Tick hoa</h2>
+
+<div class="container inventory-wrapper">
+
+    <!-- ENTITY SELECT -->
+    <div class="panel">
+        <label class="mb-2"> Chọn tên thành viên: </label>
+        <select id="entitySelect">
+            <option value="">-- Chọn --</option>
+            {% for e in entities %}
+            <option value="{{ e.id }}">{{ e.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="panel">
+        <label class="mb-2"> Nhập tên hoa cần thêm: </label>
+        <input id="searchInput" placeholder="🔍 Tìm hoa...">
+    </div>
+
+    <!-- FLOWERS LIST -->
+    <div id="flowerList" class="grid">
+
+        {% for f in flowers %}
+        <div class="flower-card" data-name="{{ f.name|lower }}">
+
+            <img src="{{ f.img }}" />
+
+            <div class="info">
+                <h4>{{ f.name }}</h4>
+
+                <div class="meta-row">
+                    <input type="checkbox" class="flower-check" value="{{ f.id }}">
+
+                    <span class="rank-text r{{ f.rank }}">
+                        Phẩm:
+                        {% if f.rank == 1 %} Lục
+                        {% elif f.rank == 2 %} Lam
+                        {% elif f.rank == 3 %} Tím
+                        {% elif f.rank == 4 %} Cam
+                        {% elif f.rank == 5 %} Đỏ
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+
+        </div>
+        {% endfor %}
+
+    </div>
+
+    <!-- LOADING -->
+    <div id="loading">Đang xử lý...</div>
+
+    <!-- MESSAGE -->
+    <div id="msg"></div>
+
+    <!-- SAVE -->
+    <button id="saveBtn">Lưu</button>
+
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script>
+    let currentEntity = null;
+
+    // ===== MSG HANDLER =====
+    function showMsg(text, color = "green") {
+        let msg = document.getElementById("msg");
+
+        msg.innerHTML = text;
+        msg.style.color = color;
+
+        msg.classList.add("show");
+
+        clearTimeout(window.msgTimer);
+
+        window.msgTimer = setTimeout(() => {
+            msg.classList.remove("show");
+        }, 2500);
+    }
+
+
+    // ===== SELECT ENTITY =====
+    document.getElementById("entitySelect").addEventListener("change", async function () {
+
+        currentEntity = this.value;
+
+        if (!currentEntity) return;
+
+        try {
+            const res = await fetch(`/inventory/${currentEntity}`);
+            const data = await res.json();
+
+            // reset all checkbox
+            document.querySelectorAll(".flower-check").forEach(cb => {
+                cb.checked = false;
+            });
+
+            // tick owned flowers
+            data.owned.forEach(o => {
+                const cb = document.querySelector(`.flower-check[value="${o.flower_id}"]`);
+                if (cb) cb.checked = true;
+            });
+
+            showMsg("Đã tải dữ liệu thành viên", "green");
+
+        } catch (err) {
+            showMsg("Không thể tải dữ liệu", "red");
+        }
+    });
+
+
+    // ===== SEARCH =====
+    document.getElementById("searchInput").addEventListener("input", function () {
+
+        let q = this.value.toLowerCase();
+
+        document.querySelectorAll(".flower-card").forEach(card => {
+            let name = card.dataset.name;
+            card.style.display = name.includes(q) ? "block" : "none";
+        });
+    });
+
+
+    // ===== SAVE =====
+    document.getElementById("saveBtn").addEventListener("click", async () => {
+
+        if (!currentEntity) {
+            showMsg("Vui lòng chọn thành viên", "red");
+            return;
+        }
+
+        let btn = document.getElementById("saveBtn");
+        let loading = document.getElementById("loading");
+
+        btn.disabled = true;
+        loading.style.display = "block";
+
+        let flower_ids = [];
+
+        document.querySelectorAll(".flower-check:checked").forEach(cb => {
+            flower_ids.push(parseInt(cb.value));
+        });
+
+        try {
+            const res = await fetch("/inventory/save", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    entity_id: parseInt(currentEntity),
+                    flower_ids: flower_ids
+                })
+            });
+
+            const data = await res.json();
+
+            showMsg(data.message, "green");
+
+        } catch (err) {
+            showMsg("❌ Có lỗi xảy ra", "red");
+        }
+
+        btn.disabled = false;
+        loading.style.display = "none";
+    });
+</script>
+{% endblock %}

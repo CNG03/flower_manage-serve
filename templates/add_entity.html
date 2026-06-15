@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}
+Thêm thành viên - Lạc Hà
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet"
+      href="{{ request.url_for('static', path='css/add_entity.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="entity-card">
+
+    <h2>🌱 Thêm thành viên</h2>
+
+    <!-- MESSAGE -->
+    {% if error %}
+        <div class="alert error">{{ error }}</div>
+    {% endif %}
+
+    {% if message %}
+        <div class="alert success">{{ message }}</div>
+    {% endif %}
+
+    <form id="entityForm" method="POST" action="/entities/create">
+
+        <div class="input-group">
+            <label>Tên thành viên</label>
+
+            <input type="text"
+                   name="name"
+                   id="nameInput"
+                   placeholder="Nhập tên thành viên..."
+                   required />
+        </div>
+
+        <button class="btn-create" type="submit" id="submitBtn">
+            <span class="btn-text">✨ Tạo mới</span>
+            <span class="spinner"></span>
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}
+
+
+{% block js %}
+<script>
+const form = document.getElementById("entityForm");
+const btn = document.getElementById("submitBtn");
+
+form.addEventListener("submit", () => {
+    btn.classList.add("loading");
+    btn.disabled = true;
+});
+</script>
+{% endblock %}

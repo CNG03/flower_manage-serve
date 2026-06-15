@@ -1,0 +1,190 @@
+{% extends "base.html" %} {% block title %} Thêm Hoa - Lạc Hà {% endblock %} {%
+block css %}
+
+<link
+    rel="stylesheet"
+    href="{{ request.url_for('static',
+path='css/add_flower.css') }}"
+/>
+
+{% endblock %} {% block content %}
+
+<div class="form-container mt-3">
+    <div class="form-title"> Thêm hoa mới</div>
+
+    <form id="flowerForm" method="POST" enctype="multipart/form-data">
+
+        <!-- NAME -->
+
+        <div class="mb-3">
+            <label class="form-label"> Tên hoa </label>
+
+            <input
+                required
+                type="text"
+                name="name"
+                class="form-control modern-input"
+                placeholder="Nhập tên hoa..."
+            />
+        </div>
+
+        <!-- IMAGE -->
+
+        <div class="mb-3">
+            <label class="form-label"> Hình ảnh </label>
+
+            <input
+                required
+                type="file"
+                name="image"
+                id="imageInput"
+                class="form-control modern-input"
+                accept="image/*"
+            />
+
+            <!-- preview -->
+
+            <div class="preview-wrapper mt-3">
+                <img id="previewImg" src="" alt="preview" />
+
+                <div id="previewText">Chưa chọn ảnh</div>
+            </div>
+        </div>
+
+        <!-- RANK -->
+
+        <div class="mb-3">
+            <label class="form-label"> Phẩm chất </label>
+
+            <div class="rank-grid mt-2">
+                <input type="radio" id="r1" name="rank" value="1" required />
+
+                <label for="r1" class="rank-item r1"> </label>
+
+                <input type="radio" id="r2" name="rank" value="2" />
+
+                <label for="r2" class="rank-item r2"> </label>
+
+                <input type="radio" id="r3" name="rank" value="3" />
+
+                <label for="r3" class="rank-item r3"> </label>
+
+                <input type="radio" id="r4" name="rank" value="4" />
+
+                <label for="r4" class="rank-item r4"> </label>
+
+                <input type="radio" id="r5" name="rank" value="5" />
+
+                <label for="r5" class="rank-item r5"> </label>
+            </div>
+        </div>
+        <!-- MESSAGE -->
+
+        <div id="msgBox" class="alert d-none"></div>
+
+        <button type="submit" id="submitBtn" class="btn-submit">
+            🌸 Thêm hoa
+        </button>
+
+        <div id="loading" class="mt-3 d-none">Đang xử lý...</div>
+    </form>
+</div>
+
+{% endblock %} {% block js %}
+
+<script>
+    const input = document.getElementById("imageInput");
+
+    const previewImg = document.getElementById("previewImg");
+
+    const previewText = document.getElementById("previewText");
+
+    const form = document.getElementById("flowerForm");
+
+    const msgBox = document.getElementById("msgBox");
+
+    const loading = document.getElementById("loading");
+
+    const btn = document.getElementById("submitBtn");
+
+    // =====================
+    // IMAGE PREVIEW
+    // =====================
+
+    input.addEventListener("change", function () {
+        const file = this.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                previewImg.src = e.target.result;
+
+                previewImg.classList.add("show");
+
+                previewText.style.display = "none";
+            };
+
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // =====================
+    // SUBMIT FORM
+    // =====================
+
+    form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        msgBox.classList.add("d-none");
+
+        loading.classList.remove("d-none");
+
+        btn.disabled = true;
+
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch("/flowers/create", {
+                method: "POST",
+                body: formData,
+            });
+
+            const data = await response.json();
+
+            loading.classList.add("d-none");
+
+            btn.disabled = false;
+
+            if (data.success) {
+                msgBox.className = "alert alert-success";
+
+                msgBox.innerText = data.message;
+
+                msgBox.classList.remove("d-none");
+
+                setTimeout(() => {
+                    window.location.href = "/";
+                }, 1000);
+            } else {
+                msgBox.className = "alert alert-danger";
+
+                msgBox.innerText = data.message;
+
+                msgBox.classList.remove("d-none");
+            }
+        } catch (error) {
+            loading.classList.add("d-none");
+
+            btn.disabled = false;
+
+            msgBox.className = "alert alert-danger";
+
+            msgBox.innerText = "Không thể kết nối server";
+
+            msgBox.classList.remove("d-none");
+        }
+    });
+</script>
+
+{% endblock %}
