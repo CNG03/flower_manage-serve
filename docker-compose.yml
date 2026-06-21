@@ -33,10 +33,22 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./static:/app/static:ro
-      - ./ssl:/etc/letsencrypt:ro
+      - ./ssl:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
 
     depends_on:
       - app
+
+  certbot:
+
+    image: certbot/certbot
+
+    container_name: flower_certbot
+
+    volumes:
+      - ./ssl:/etc/letsencrypt
+
+      - ./certbot/www:/var/www/certbot
 
 
   cron:
