@@ -1,49 +1,31 @@
 {% extends "base.html" %} {% block title %}Danh sách hoa - Lạc Hà{% endblock %}
 {% block css %}
-<link
-    rel="stylesheet"
-    href="{{ request.url_for('static', path='css/flowers.css') }}"
-/>
+<link rel="stylesheet" href="{{ request.url_for('static', path='css/flowers.css') }}" />
 {% endblock %} {% block content %}
 
 <h2 class="page-title">🌸 Danh sách hoa</h2>
 
 <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="🔎 Tìm kiếm hoa..." class="search-input" />
 
-    <input type="text"
-           id="searchInput"
-           placeholder="🔎 Tìm kiếm hoa..."
-           class="search-input">
-
-    <button class="btn-reset" onclick="resetSearch()">
-         Làm mới
-    </button>
-
+    <button class="btn-reset" onclick="resetSearch()">Làm mới</button>
 </div>
 <div class="rank-filter-wrapper">
-
     <span class="filter-label">🌈 Phẩm:</span>
 
     <div class="rank-filter-list">
-
         <button class="rank-chip active" data-rank="all">Tất cả</button>
         <button class="rank-chip r1-chip" data-rank="1">Lục</button>
         <button class="rank-chip r2-chip" data-rank="2">Lam</button>
         <button class="rank-chip r3-chip" data-rank="3">Tím</button>
         <button class="rank-chip r4-chip" data-rank="4">Cam</button>
         <button class="rank-chip r5-chip" data-rank="5">Đỏ</button>
-
     </div>
-
 </div>
-<div class="total-flower">
-    🌸 Tổng số hoa: {{ flowers | length }}
-</div>
+<div class="total-flower">🌸 Tổng số hoa: {{ flowers | length }}</div>
 <div class="flower-grid">
     {% for f in flowers %}
-    <div class="flower-card"
-     data-name="{{ f.name | lower }}"
-     data-rank="{{ f.rank }}">
+    <div class="flower-card" data-id="{{ f.id }}" data-name="{{ f.name | lower }}" data-rank="{{ f.rank }}">
         <img class="flower-img" src="{{ f.img }}" alt="{{ f.name }}" />
 
         <div class="flower-info">
@@ -65,13 +47,13 @@
 
             <div class="flower-actions">
                 <!-- EDIT -->
-                <a class="btn-edit" href="/flowers/edit/{{ f.id }}">✍️ Sửa </a>
+                <!-- <a class="btn-edit" href="/flowers/edit/{{ f.id }}">✍️ Sửa </a> -->
+                <button class="btn-edit" onclick="openEditModal('{{ f.id }}')">
+                    ✍️ Sửa
+                </button>
 
                 <!-- DELETE -->
-                <button
-                    class="btn-delete"
-                    onclick="confirmDelete(this, '{{ f.id }}')"
-                >
+                <button class="btn-delete" onclick="confirmDelete(this, '{{ f.id }}')">
                     ✖️ Xóa
                 </button>
             </div>
@@ -83,139 +65,301 @@
 <div id="emptyState" class="empty-state d-none">
     🌱 Không tìm thấy bông hoa nào
 </div>
+<!-- EDIT MODAL -->
+<div id="editModal" class="edit-modal">
+    <div class="edit-modal-box">
+        <button class="modal-close" onclick="closeEditModal()">✖</button>
+
+        <h3>✍️ Chỉnh sửa hoa</h3>
+
+        <form id="editForm">
+            <input type="hidden" id="editId" />
+
+            <label> Tên hoa </label>
+
+            <input id="editName" class="modal-input" required />
+
+            <label> Hình ảnh </label>
+
+            <input type="file" id="editImage" accept="image/*" class="modal-input" />
+
+            <img id="editPreview" class="modal-preview" />
+            <label> Phẩm </label>
+            <div class="modal-rank">
+                <label class="rank-select r1">
+                    <input type="radio" name="editRank" value="1" />
+                    Lục
+                </label>
+                <label class="rank-select r2">
+                    <input type="radio" name="editRank" value="2" />
+                    Lam
+                </label>
+                <label class="rank-select r3">
+                    <input type="radio" name="editRank" value="3" />
+                    Tím
+                </label>
+                <label class="rank-select r4">
+                    <input type="radio" name="editRank" value="4" />
+                    Cam
+                </label>
+                <label class="rank-select r5">
+                    <input type="radio" name="editRank" value="5" />
+                    Đỏ
+                </label>
+            </div>
+
+            <button class="modal-submit">Cập nhật</button>
+        </form>
+    </div>
+</div>
 
 <!-- JS confirm delete -->
 <script>
-async function confirmDelete(btn, id) {
+    async function confirmDelete(btn, id) {
+        const ok = confirm("Bạn có chắc muốn xóa bông hoa này không?");
+        if (!ok) return;
 
-    const ok = confirm("Bạn có chắc muốn xóa bông hoa này không?");
-    if (!ok) return;
+        // UI loading state
+        btn.disabled = true;
+        btn.innerText = "Deleting...";
 
-    // UI loading state
-    btn.disabled = true;
-    btn.innerText = "Deleting...";
+        try {
+            const res = await fetch(`/flowers/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
 
-    try {
-        const res = await fetch(`/flowers/${id}`, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json"
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.detail || "Delete failed");
+            }
+
+            // success UI
+            showToast("Xóa thành công 🌸", "success");
+
+            // remove card khỏi UI
+            btn.closest(".flower-card").remove();
+        } catch (err) {
+            showToast(err.message, "error");
+
+            btn.disabled = false;
+            btn.innerText = "Delete";
+        }
+    }
+
+    /* Toast system */
+    function showToast(message, type) {
+        let toast = document.createElement("div");
+
+        toast.className = `toast-msg ${type}`;
+        toast.innerText = message;
+
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.add("show");
+        }, 100);
+
+        setTimeout(() => {
+            toast.remove();
+        }, 2500);
+    }
+    const searchInput = document.getElementById("searchInput");
+    const cards = document.querySelectorAll(".flower-card");
+    const emptyState = document.getElementById("emptyState");
+
+    const rankButtons = document.querySelectorAll(".rank-chip");
+
+    let currentRank = "all";
+    let currentQuery = "";
+
+    // ===== FILTER CORE =====
+    function filterFlowers() {
+        let hasResult = false;
+
+        cards.forEach((card) => {
+            const name = card.dataset.name;
+            const rank = card.dataset.rank;
+
+            const matchName = name.includes(currentQuery);
+            const matchRank = currentRank === "all" || rank === currentRank;
+
+            if (matchName && matchRank) {
+                card.style.display = "";
+                hasResult = true;
+            } else {
+                card.style.display = "none";
             }
         });
 
-        const data = await res.json();
-
-        if (!res.ok) {
-            throw new Error(data.detail || "Delete failed");
-        }
-
-        // success UI
-        showToast("Xóa thành công 🌸", "success");
-
-        // remove card khỏi UI
-        btn.closest(".flower-card").remove();
-
-    } catch (err) {
-
-        showToast(err.message, "error");
-
-        btn.disabled = false;
-        btn.innerText = "Delete";
+        emptyState.classList.toggle("d-none", hasResult);
     }
-}
 
-/* Toast system */
-function showToast(message, type) {
-
-    let toast = document.createElement("div");
-
-    toast.className = `toast-msg ${type}`;
-    toast.innerText = message;
-
-    document.body.appendChild(toast);
-
-    setTimeout(() => {
-        toast.classList.add("show");
-    }, 100);
-
-    setTimeout(() => {
-        toast.remove();
-    }, 2500);
-}
-const searchInput = document.getElementById("searchInput");
-const cards = document.querySelectorAll(".flower-card");
-const emptyState = document.getElementById("emptyState");
-
-const rankButtons = document.querySelectorAll(".rank-chip");
-
-let currentRank = "all";
-let currentQuery = "";
-
-
-// ===== FILTER CORE =====
-function filterFlowers() {
-
-    let hasResult = false;
-
-    cards.forEach(card => {
-
-        const name = card.dataset.name;
-        const rank = card.dataset.rank;
-
-        const matchName = name.includes(currentQuery);
-        const matchRank = currentRank === "all" || rank === currentRank;
-
-        if (matchName && matchRank) {
-            card.style.display = "";
-            hasResult = true;
-        } else {
-            card.style.display = "none";
-        }
-
+    // ===== SEARCH =====
+    searchInput.addEventListener("input", function () {
+        currentQuery = this.value.toLowerCase().trim();
+        filterFlowers();
     });
 
-    emptyState.classList.toggle("d-none", hasResult);
-}
+    // ===== FILTER RANK =====
+    rankButtons.forEach((btn) => {
+        btn.addEventListener("click", function () {
+            rankButtons.forEach((b) => b.classList.remove("active"));
+            this.classList.add("active");
 
+            currentRank = this.dataset.rank;
 
-// ===== SEARCH =====
-searchInput.addEventListener("input", function () {
+            filterFlowers();
+        });
+    });
 
-    currentQuery = this.value.toLowerCase().trim();
-    filterFlowers();
+    // ===== RESET =====
+    function resetSearch() {
+        searchInput.value = "";
+        currentQuery = "";
+        currentRank = "all";
 
-});
-
-
-// ===== FILTER RANK =====
-rankButtons.forEach(btn => {
-
-    btn.addEventListener("click", function () {
-
-        rankButtons.forEach(b => b.classList.remove("active"));
-        this.classList.add("active");
-
-        currentRank = this.dataset.rank;
+        rankButtons.forEach((b) => b.classList.remove("active"));
+        document.querySelector('[data-rank="all"]').classList.add("active");
 
         filterFlowers();
-
-    });
-
-});
-
-
-// ===== RESET =====
-function resetSearch() {
-
-    searchInput.value = "";
-    currentQuery = "";
-    currentRank = "all";
-
-    rankButtons.forEach(b => b.classList.remove("active"));
-    document.querySelector('[data-rank="all"]').classList.add("active");
-
-    filterFlowers();
-}
+    }
 </script>
+<script>
+    let currentCard = null;
 
+    const rankText = {
+        1: "Lục",
+        2: "Lam",
+        3: "Tím",
+        4: "Cam",
+        5: "Đỏ",
+    };
+
+    async function openEditModal(id) {
+        const res = await fetch(`/flowers/${id}`);
+
+        const flower = await res.json();
+
+        document.getElementById("editId").value = id;
+
+        document.getElementById("editName").value = flower.name;
+
+        const preview = document.getElementById("editPreview");
+
+        preview.src = flower.img;
+        preview.style.display = "block";
+
+        document.querySelectorAll('input[name="editRank"]').forEach((x) => {
+            x.checked = x.value == flower.rank;
+        });
+
+        // tìm bằng id
+        currentCard = document.querySelector(`.flower-card[data-id="${id}"]`);
+
+        document.getElementById("editModal").classList.add("show");
+    }
+
+    function closeEditModal() {
+        document.getElementById("editModal").classList.remove("show");
+    }
+
+    document
+        .getElementById("editImage")
+        .addEventListener("change", function () {
+            const file = this.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+
+                reader.onload = (e) => {
+                    const img = document.getElementById("editPreview");
+
+                    img.src = e.target.result;
+
+                    img.style.display = "block";
+                };
+
+                reader.readAsDataURL(file);
+            }
+        });
+
+    document
+        .getElementById("editForm")
+        .addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const id = document.getElementById("editId").value;
+
+            const fd = new FormData();
+
+            const name = document.getElementById("editName").value;
+
+            const rank = document.querySelector(
+                'input[name="editRank"]:checked',
+            ).value;
+
+            fd.append("name", name);
+
+            fd.append("rank", rank);
+
+            const image = document.getElementById("editImage").files[0];
+
+            if (image) {
+                fd.append("image", image);
+            }
+
+            const res = await fetch(`/flowers/${id}`, {
+                method: "PUT",
+
+                body: fd,
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                showToast("Cập nhật thành công 🌸", "success");
+
+                if (currentCard) {
+                    // update name
+
+                    currentCard.querySelector(".flower-name").innerText = name;
+
+                    // update rank data
+
+                    currentCard.dataset.rank = rank;
+
+                    // update rank text
+
+                    const span = currentCard.querySelector(".flower-rank span");
+
+                    span.innerText = rankText[rank];
+
+                    // reset class màu
+
+                    span.className = "";
+
+                    span.classList.add(`rank-${rank}`);
+
+                    // update ảnh
+
+                    if (image) {
+                        const reader = new FileReader();
+
+                        reader.onload = (e) => {
+                            currentCard.querySelector(".flower-img").src =
+                                e.target.result;
+                        };
+
+                        reader.readAsDataURL(image);
+                    }
+                }
+
+                closeEditModal();
+            }
+        });
+</script>
 {% endblock %}

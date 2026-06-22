@@ -69,6 +69,7 @@
     color: #ff4d6d;
     border-radius: 6px;
     text-decoration: none;
+    border-color: transparent;
     font-size: 13px;
     transition: background 0.2s ease; /* Thêm hiệu ứng mượt mà */
 }
@@ -92,7 +93,6 @@
 .btn-delete:hover {
     background: #ffdad9; /* Nền đỏ nhạt đậm hơn một chút */
 }
-
 
 .flower-owner {
     font-size: 13px;
@@ -268,22 +268,47 @@
 
 .rank-chip.active {
     color: white;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 /* màu từng rank */
-.r1-chip { background: #dff9e8; color: #219653; }
-.r2-chip { background: #dbeeff; color: #2471a3; }
-.r3-chip { background: #f0ddff; color: #7d3c98; }
-.r4-chip { background: #ffe8cc; color: #b65f00; }
-.r5-chip { background: #ffe0df; color: #c0392b; }
+.r1-chip {
+    background: #dff9e8;
+    color: #219653;
+}
+.r2-chip {
+    background: #dbeeff;
+    color: #2471a3;
+}
+.r3-chip {
+    background: #f0ddff;
+    color: #7d3c98;
+}
+.r4-chip {
+    background: #ffe8cc;
+    color: #b65f00;
+}
+.r5-chip {
+    background: #ffe0df;
+    color: #c0392b;
+}
 
 /* active mạnh */
-.r1-chip.active { background: #2ecc71; }
-.r2-chip.active { background: #3498db; }
-.r3-chip.active { background: #9b59b6; }
-.r4-chip.active { background: #e67e22; }
-.r5-chip.active { background: #e74c3c; }
+.r1-chip.active {
+    background: #2ecc71;
+}
+.r2-chip.active {
+    background: #3498db;
+}
+.r3-chip.active {
+    background: #9b59b6;
+}
+.r4-chip.active {
+    background: #e67e22;
+}
+.r5-chip.active {
+    background: #e74c3c;
+}
 
 /* mobile */
 @media (max-width: 600px) {
@@ -296,11 +321,10 @@
 .rank-chip.active {
     background: #343a40;
     color: white;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, .18);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
 }
 
 @media (max-width: 600px) {
-
     .flower-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 10px;
@@ -326,13 +350,241 @@
     .flower-info {
         padding: 10px;
     }
-
 }
 
 @media (max-width: 900px) and (min-width: 601px) {
-
     .flower-grid {
         grid-template-columns: repeat(3, 1fr);
     }
+}
 
+/* ======================
+   EDIT MODAL
+====================== */
+
+.edit-modal {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.45);
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    z-index: 9999;
+
+    padding: 15px;
+}
+
+.edit-modal.show {
+    display: flex;
+}
+
+.edit-modal-box {
+    width: 100%;
+    max-width: 500px;
+
+    background: white;
+
+    border-radius: 20px;
+
+    padding: 25px;
+
+    position: relative;
+
+    animation: modalShow 0.25s ease;
+
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+@keyframes modalShow {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.modal-close {
+    position: absolute;
+
+    right: 15px;
+    top: 15px;
+
+    border: none;
+    background: #eee;
+
+    width: 35px;
+    height: 35px;
+
+    border-radius: 50%;
+}
+
+.modal-input {
+    width: 100%;
+
+    padding: 10px;
+
+    border-radius: 12px;
+
+    border: 1px solid #ddd;
+
+    margin-bottom: 15px;
+}
+
+.modal-preview {
+    width: 120px;
+    height: 120px;
+
+    object-fit: cover;
+
+    border-radius: 15px;
+
+    display: none;
+
+    margin: 10px auto;
+}
+
+.modal-rank {
+    display: flex;
+
+    gap: 10px;
+
+    margin: 15px 0;
+}
+
+.modal-rank label {
+    flex: 1;
+
+    text-align: center;
+
+    padding: 10px;
+
+    background: #eee;
+
+    border-radius: 12px;
+
+    cursor: pointer;
+}
+
+.modal-submit {
+    width: 100%;
+
+    padding: 12px;
+
+    border: none;
+
+    border-radius: 14px;
+
+    background: #ff4d6d;
+
+    color: white;
+
+    font-weight: bold;
+}
+
+/* MOBILE */
+
+@media (max-width: 576px) {
+    .edit-modal {
+        align-items: flex-end;
+    }
+
+    .edit-modal-box {
+        max-width: 100%;
+
+        border-radius: 22px 22px 0 0;
+
+        padding: 20px;
+    }
+
+    .modal-preview {
+        width: 100px;
+        height: 100px;
+    }
+
+    .modal-rank {
+        display: grid;
+
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+.modal-rank {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+
+    margin: 15px 0;
+}
+
+.rank-select {
+    padding: 10px 5px;
+
+    border-radius: 12px;
+
+    text-align: center;
+
+    cursor: pointer;
+
+    font-weight: 600;
+
+    transition: 0.2s;
+}
+
+.rank-select input {
+    display: none;
+}
+
+.rank-select.r1 {
+    background: #73f1b0;
+}
+
+.rank-select.r2 {
+    background: #91b8ed;
+}
+
+.rank-select.r3 {
+    background: #8368f3;
+    color: white;
+}
+
+.rank-select.r4 {
+    background: #feb450;
+}
+
+.rank-select.r5 {
+    background: #f23636;
+    color: white;
+}
+
+.rank-select:hover {
+    transform: translateY(-3px);
+}
+
+.rank-select:has(input:checked) {
+    box-shadow: 0 0 0 3px #717171;
+
+    transform: scale(1.05);
+}
+
+@media (max-width: 576px) {
+    .modal-rank {
+        grid-template-columns: repeat(5, 1fr);
+
+        gap: 5px;
+    }
+
+    .rank-select {
+        font-size: 13px;
+
+        padding: 8px 2px;
+    }
 }

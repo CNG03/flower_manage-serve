@@ -6,7 +6,6 @@ endblock %} {% block css %}
 />
 {% endblock %} {% block content %}
 <h2 class="page-title">🌸 Danh sách thành viên hội</h2>
-
 <div class="entity-wrapper">
     <!-- SEARCH -->
     <div class="search-box">
@@ -25,6 +24,10 @@ endblock %} {% block css %}
             </button>
         </form>
     </div>
+    <div class="total-member">
+    <div class="total-label">Tổng số thành viên</div>
+    <div class="total-number">{{ entities | length }}</div>
+</div>
 
     <!-- TABLE LIST -->
     <div class="entity-table">
