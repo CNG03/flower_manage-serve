@@ -25,23 +25,31 @@ select, input {
 ========================= */
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, 180px);
-    justify-content: center; /* 👈 giữ card ở giữa màn hình */
-    gap: 16px;
+
+    /* auto fit để responsive thật */
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+
+    gap: 14px;
+
+    justify-content: center;
 }
 
 /* =========================
    CARD FIX WIDTH
 ========================= */
 .flower-card {
-    width: 180px;           /* 👈 cố định width */
-    min-width: 180px;
-    max-width: 180px;       /* 👈 không cho giãn */
-    
+    width: 100%;
+    max-width: 180px;
+
+    margin: auto;
+
     background: white;
     border-radius: 14px;
+
     overflow: hidden;
+
     box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+
     transition: 0.2s ease;
 }
 
@@ -222,5 +230,106 @@ select, input {
         width: calc(100vw - 20px);
         left: 10px;
         right: 10px;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .flower-card {
+        max-width: 100%;
+    }
+
+    .flower-card img {
+        height: 100px;
+    }
+
+    .info h4 {
+        font-size: 0.95rem;
+        -webkit-line-clamp: 2; /* giảm height cho mobile */
+        height: auto;
+    }
+
+    .rank-text {
+        font-size: 0.85rem;
+    }
+
+    .flower-check {
+        width: 26px;
+        height: 26px;
+    }
+}
+
+@media (max-width: 900px) and (min-width: 601px) {
+    .grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.rank-filter-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filter-label {
+    font-weight: 700;
+    color: #555;
+}
+
+.rank-filter-list {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* chip */
+.rank-chip {
+    border: none;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    background: #f1f3f5;
+    transition: 0.2s;
+}
+
+/* hover */
+.rank-chip:hover {
+    transform: translateY(-2px);
+}
+
+/* active chung */
+.rank-chip.active {
+    background: #343a40;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .18);
+}
+
+/* màu từng rank */
+.r1-chip { background: #dff9e8; color: #219653; }
+.r2-chip { background: #dbeeff; color: #2471a3; }
+.r3-chip { background: #f0ddff; color: #7d3c98; }
+.r4-chip { background: #ffe8cc; color: #b65f00; }
+.r5-chip { background: #ffe0df; color: #c0392b; }
+
+/* active màu mạnh */
+.r1-chip.active { background: #2ecc71; }
+.r2-chip.active { background: #3498db; }
+.r3-chip.active { background: #9b59b6; }
+.r4-chip.active { background: #e67e22; }
+.r5-chip.active { background: #e74c3c; }
+
+/* mobile gọn */
+@media (max-width: 600px) {
+    .rank-chip {
+        flex: 1;
+        text-align: center;
     }
 }

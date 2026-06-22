@@ -28,11 +28,31 @@
         <input id="searchInput" placeholder="🔍 Tìm hoa...">
     </div>
 
+    <div class="panel rank-filter-wrapper">
+
+        <span class="filter-label">🌈 Phẩm:</span>
+
+        <div class="rank-filter-list">
+
+            <button class="rank-chip active" data-rank="all">
+                Tất cả
+            </button>
+
+            <button class="rank-chip r1-chip" data-rank="1">Lục</button>
+            <button class="rank-chip r2-chip" data-rank="2">Lam</button>
+            <button class="rank-chip r3-chip" data-rank="3">Tím</button>
+            <button class="rank-chip r4-chip" data-rank="4">Cam</button>
+            <button class="rank-chip r5-chip" data-rank="5">Đỏ</button>
+
+        </div>
+
+    </div>
+
     <!-- FLOWERS LIST -->
     <div id="flowerList" class="grid">
 
         {% for f in flowers %}
-        <div class="flower-card" data-name="{{ f.name|lower }}">
+        <div class="flower-card" data-name="{{ f.name|lower }}" data-rank="{{ f.rank }}">
 
             <img src="{{ f.img }}" />
 
@@ -124,15 +144,81 @@
 
 
     // ===== SEARCH =====
-    document.getElementById("searchInput").addEventListener("input", function () {
+    let currentRank = "all";
+    let currentQuery = "";
 
-        let q = this.value.toLowerCase();
+    const searchInput = document.getElementById("searchInput");
+    const cards = document.querySelectorAll(".flower-card");
+    const emptyState = document.getElementById("emptyState");
 
-        document.querySelectorAll(".flower-card").forEach(card => {
-            let name = card.dataset.name;
-            card.style.display = name.includes(q) ? "block" : "none";
+    const rankButtons = document.querySelectorAll(".rank-chip");
+
+
+    // ===== FILTER CORE =====
+    function filterFlowers() {
+
+        let hasResult = false;
+
+        cards.forEach(card => {
+
+            const name = card.dataset.name;
+            const rank = card.dataset.rank;
+
+            const matchName = name.includes(currentQuery);
+            const matchRank = currentRank === "all" || rank === currentRank;
+
+            if (matchName && matchRank) {
+                card.style.display = "";
+                hasResult = true;
+            } else {
+                card.style.display = "none";
+            }
+
         });
+
+        emptyState.classList.toggle("d-none", hasResult);
+    }
+
+
+    // ===== SEARCH =====
+    searchInput.addEventListener("input", function () {
+
+        currentQuery = this.value.toLowerCase().trim();
+        filterFlowers();
+
     });
+
+
+    // ===== RANK FILTER =====
+    rankButtons.forEach(btn => {
+
+        btn.addEventListener("click", function () {
+
+            rankButtons.forEach(b => b.classList.remove("active"));
+            this.classList.add("active");
+
+            currentRank = this.dataset.rank;
+
+            filterFlowers();
+
+        });
+
+    });
+
+
+    // ===== RESET FUNCTION (update lại) =====
+    function resetSearch() {
+
+        searchInput.value = "";
+        currentQuery = "";
+        currentRank = "all";
+
+        rankButtons.forEach(b => b.classList.remove("active"));
+        document.querySelector('[data-rank="all"]').classList.add("active");
+
+        filterFlowers();
+    }
+
 
 
     // ===== SAVE =====

@@ -139,3 +139,251 @@
     color: #e74c3c;
     font-weight: bold;
 } /* Đỏ */
+
+/* =========================
+   FILTER RANK
+========================= */
+
+/* ======================
+   RANK CHIP FILTER
+====================== */
+
+.rank-filter-wrapper {
+
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    margin:15px 0;
+
+}
+
+
+.filter-label {
+
+    font-weight:700;
+
+    font-size:14px;
+
+    white-space:nowrap;
+
+    color:#555;
+
+}
+
+
+
+.rank-filter-list {
+
+    display:flex;
+
+    gap:8px;
+
+    flex-wrap:wrap;
+
+}
+
+
+
+.rank-chip {
+
+
+    border:none;
+
+    padding:7px 15px;
+
+
+    border-radius:999px;
+
+
+    font-size:13px;
+
+    font-weight:600;
+
+
+    cursor:pointer;
+
+
+    background:#f1f3f5;
+
+    color:#555;
+
+
+    transition:.2s ease;
+
+
+}
+
+
+
+/* hover */
+
+.rank-chip:hover {
+
+    transform:translateY(-2px);
+
+}
+
+
+
+/* active */
+
+.rank-chip.active {
+
+
+    background:#343a40;
+
+    color:white;
+
+
+    box-shadow:
+    0 4px 12px rgba(0,0,0,.18);
+
+}
+
+
+
+/* từng phẩm */
+
+
+.rank-1-chip {
+
+    background:#dff9e8;
+
+    color:#219653;
+
+}
+
+
+
+.rank-2-chip {
+
+    background:#dbeeff;
+
+    color:#2471a3;
+
+}
+
+
+
+.rank-3-chip {
+
+    background:#f0ddff;
+
+    color:#7d3c98;
+
+}
+
+
+
+.rank-4-chip {
+
+    background:#ffe8cc;
+
+    color:#b65f00;
+
+}
+
+
+
+.rank-5-chip {
+
+    background:#ffe0df;
+
+    color:#c0392b;
+
+}
+
+
+
+/* active theo màu */
+
+.rank-1-chip.active {
+
+    background:#2ecc71;
+
+    color:white;
+
+}
+
+
+.rank-2-chip.active {
+
+    background:#3498db;
+
+    color:white;
+
+}
+
+
+.rank-3-chip.active {
+
+    background:#9b59b6;
+
+    color:white;
+
+}
+
+
+.rank-4-chip.active {
+
+    background:#e67e22;
+
+    color:white;
+
+}
+
+
+.rank-5-chip.active {
+
+    background:#e74c3c;
+
+    color:white;
+
+}
+
+
+
+/* MOBILE */
+
+@media(max-width:600px){
+
+
+    .rank-filter-wrapper {
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:8px;
+
+        margin:12px 5px;
+
+    }
+
+
+    .rank-filter-list {
+
+        width:100%;
+
+        gap:6px;
+
+    }
+
+
+
+    .rank-chip {
+
+
+        flex:1;
+
+        min-width:70px;
+
+        text-align:center;
+
+        padding:8px 10px;
+
+    }
+
+
+}
